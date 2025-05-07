@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Mapping - The Chennai Mobiles</title>
+    <!-- REMOVED: <script src="https://cdn.tailwindcss.com"></script> --> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css"> <!-- Your custom styles -->
+</head>
+<body>
+    <div class="container">
+        <!-- Added custom classes for headings -->
+        <h1 class="page-title">Brand Mapping Tool</h1>
+        <p class="page-subtitle">The Chennai Mobiles - Streamlined EMI Mapping</p>
+
+        <nav class="brand-nav">
+            <button class="brand-nav-button active" data-target-brand="mi">MI</button>
+            <button class="brand-nav-button" data-target-brand="apple">APPLE</button>
+            <button class="brand-nav-button" data-target-brand="samsung">SAMSUNG</button>
+            <button class="brand-nav-button" data-target-brand="hp">HP</button>
+        </nav>
+
+        <div id="brand-section-mi" class="brand-section">
+             <!-- Added custom class for section title -->
+            <h2 class="section-title">MI Mapping</h2>
+
+           <!-- Inside id="brand-section-mi" -->
+<div class="form-group">
+    <label>Upload Store Details (Excel)</label> <!-- General label for the group -->
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+        <!-- This label acts as the visible button -->
+        <label for="excelFile" class="choose-file-button" style="background-color: #FFA000; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; display: inline-block;">
+            Choose File
+        </label>
+        <!-- The actual file input, visually hidden but still functional -->
+        <input type="file" id="excelFile" style="display: none;" accept=".xlsx, .xls">
+        <!-- Span to display the chosen file name -->
+        <span id="fileNameDisplay" style="font-size: 0.9em;"></span>
+    </div>
+    <div id="loadingMessage" class="loading-message hidden">
+        Loading file... <span class="loader"></span>
+    </div>
+</div>
+
+            <div class="form-group">
+                <label for="typeSelect">Select Type</label>
+                <select id="typeSelect" class="form-control" disabled>
+                    <option value="">-- Select Type --</option>
+                    <option value="Pinelabs">Pinelabs</option>
+                    <option value="Finance">Finance</option>
+                </select>
+            </div>
+
+            <div id="storeSelectDiv" class="form-group hidden">
+                <label for="storeSelect">Select Stores (Searchable Filter)</label>
+                <select id="storeSelect" multiple class="form-control"></select>
+            </div>
+
+            <div id="financeSelectDiv" class="form-group hidden">
+                <label for="financeSelect">Select Finance Provider</label>
+                <select id="financeSelect" class="form-control">
+                    <option value="">-- Select Finance Provider --</option>
+                    <option value="BAJAJ">BAJAJ</option>
+                    <option value="HDB">HDB</option>
+                    <option value="IDFC">IDFC</option>
+                    <option value="HDFC">HDFC</option>
+                    <option value="TVS">TVS</option>
+                    <option value="HMC">HMC</option>
+                    <option value="ICICI">ICICI</option>
+                    <option value="KOTAK">KOTAK</option>
+                    <option value="BENOW">BENOW</option>
+                </select>
+            </div>
+
+            <div id="outputDiv" class="mt-8 hidden">
+                <div id="emailInfoSection" class="email-info-section hidden">
+                     <!-- Added custom class for sub-section title -->
+                    <h3 class="sub-section-title">Suggested Email Draft:</h3>
+                    <div class="email-details"> <!-- Added custom class -->
+                        <p><strong class="email-label">To:</strong> <span id="emailTo">-</span></p>
+                        <p><strong class="email-label">CC:</strong> <span id="emailCC">-</span></p>
+                        <p><strong class="email-label">Subject:</strong> <span id="emailSubject">-</span></p>
+                    </div>
+                    <div class="form-group mb-0">
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="emailBody" class="font-semibold text-gray-700">Email Body:</label>
+                             <!-- Removed Tailwind classes, added custom class -->
+                            <button id="copyEmailBodyBtn" class="btn-small-secondary">
+                                Copy
+                            </button>
+                        </div>
+                        <textarea id="emailBody" class="form-textarea" readonly rows="6"></textarea>
+                    </div>
+                </div>
+
+                 <!-- Added custom class for section title -->
+                <h2 class="section-title">MI Brand Mapping Result</h2>
+                <div id="noFormatMessage" class="alert alert-danger hidden"></div> <!-- Added custom classes -->
+                <div class="overflow-x-auto">
+                    <table id="mappingTable" class="hidden">
+                        <thead id="tableHead"></thead>
+                        <tbody id="mappingBody"></tbody>
+                    </table>
+                </div>
+                <button id="exportButton" class="btn btn-primary mt-6 w-full md:w-auto hidden">Export to Excel</button>
+            </div>
+        </div>
+
+        <div id="appleOutputDiv" class="mt-8 hidden">
+            <div id="appleEmailInfoSection" class="email-info-section hidden">
+                <h3 class="sub-section-title">Suggested Email Draft:</h3>
+                <div class="email-details">
+                    <p><strong class="email-label">To:</strong> <span id="appleEmailTo">-</span></p>
+                    <p><strong class="email-label">CC:</strong> <span id="appleEmailCC">-</span></p>
+                    <p><strong class="email-label">Subject:</strong> <span id="appleEmailSubject">-</span></p>
+                </div>
+                <div class="form-group mb-0">
+                    <div class="flex justify-between items-center mb-1">
+                        <label for="appleEmailBody" class="font-semibold text-gray-700">Email Body:</label>
+                        <button id="appleCopyEmailBodyBtn" class="btn-small-secondary">
+                            Copy
+                        </button>
+                    </div>
+                    <textarea id="appleEmailBody" class="form-textarea" readonly rows="6"></textarea>
+                </div>
+            </div>
+        
+            <h2 class="section-title">Apple Brand Mapping Result</h2>
+            <div id="appleNoFormatMessage" class="alert alert-danger hidden"></div>
+            <div class="overflow-x-auto">
+                <h3 class="sub-section-title" id="financeTableTitle" style="display: none;">Finance Mapping</h3>
+                <table id="appleMappingTable" class="hidden">
+                    <thead id="appleTableHead"></thead>
+                    <tbody id="appleMappingBody"></tbody>
+                </table>
+            </div>
+            <div class="overflow-x-auto mt-6">
+                <h3 class="sub-section-title" id="pinelabsTableTitle" style="display: none;">Pinelabs Mapping</h3>
+                <table id="applePinelabsTable" class="hidden">
+                    <thead id="applePinelabsTableHead"></thead>
+                    <tbody id="applePinelabsTableBody"></tbody>
+                </table>
+            </div>
+            <button id="appleExportButton" class="btn btn-primary mt-6 w-full md:w-auto hidden">Export to Excel</button>
+        </div>
+
+        <div id="brand-section-samsung" class="brand-section hidden">
+            <h2 class="section-title">SAMSUNG Mapping (Coming Soon)</h2>
+            <p class="text-center text-gray-600">Content and functionality for SAMSUNG mapping will be added here.</p>
+        </div>
+
+        <div id="brand-section-hp" class="brand-section hidden">
+            <h2 class="section-title">HP Mapping (Coming Soon)</h2>
+            <p class="text-center text-gray-600">Content and functionality for HP mapping will be added here.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+<script src="mipinelabs.js"></script>
+<script src="applemapping.js"></script>
+<script src="applepinelabs.js"></script>
+
+</body>
+</html>
